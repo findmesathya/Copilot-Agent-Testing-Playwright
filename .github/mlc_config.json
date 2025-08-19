@@ -1,0 +1,19 @@
+{
+  "replacements": [
+    {
+      "pattern": "https://github.com/your-username/copilot-playwright-testing",
+      "replacement": "https://github.com/placeholder/copilot-playwright-testing"
+    }
+  ],
+  "ignorePatterns": [
+    {
+      "pattern": "^https://platform\\.openai\\.com"
+    },
+    {
+      "pattern": "^https://playwright\\.dev"
+    },
+    {
+      "pattern": "^https://code\\.visualstudio\\.com"
+    }
+  ]
+}

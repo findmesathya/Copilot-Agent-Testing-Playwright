@@ -1,0 +1,61 @@
+{
+  "name": "copilot-playwright-testing",
+  "version": "1.0.0",
+  "description": "Advanced Playwright testing framework for Microsoft Copilot with LLM-powered conversation analysis, video recording, and beautiful HTML reports",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/copilot-playwright-testing.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/copilot-playwright-testing/issues"
+  },
+  "homepage": "https://github.com/your-username/copilot-playwright-testing#readme",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:report": "playwright show-report",
+    "test:copilot": "playwright test tests/copilot-prompt-coach.spec.ts --project=chromium-auth",
+    "test:copilot-pom": "playwright test tests/copilot-prompt-coach-pom.spec.ts --project=chromium-auth",
+    "test:copilot-existing": "playwright test tests/copilot-existing-browser.spec.ts --project=chromium-no-auth",
+    "test:copilot-conversation": "playwright test tests/copilot-existing-browser.spec.ts --project=chromium-no-auth --headed",
+    "test:copilot-generic": "playwright test tests/copilot-generic-agent-testing.spec.ts --project=chromium-no-auth",
+    "test:copilot-edge": "playwright test tests/copilot-prompt-coach.spec.ts --project=msedge",
+    "test:copilot-headed": "playwright test tests/copilot-prompt-coach.spec.ts --headed --project=chromium-auth",
+    "test-openai": "node test-openai.js",
+    "generate-report": "node generate-report.js",
+    "open-report": "node open-report.js",
+    "test:conversation-with-report": "npm run test:copilot-conversation && npm run generate-report && npm run open-report",
+    "auth:setup": "playwright test tests/auth.setup.ts --project=setup --headed",
+    "auth:setup-headless": "playwright test tests/auth.setup.ts --project=setup",
+    "install:browsers": "playwright install"
+  },
+  "keywords": [
+    "playwright",
+    "testing",
+    "automation",
+    "copilot",
+    "microsoft",
+    "e2e",
+    "ai",
+    "llm",
+    "gpt-4o",
+    "conversation",
+    "video-recording",
+    "html-reports",
+    "typescript",
+    "edge"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.54.2",
+    "@types/node": "^24.2.0",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.1"
+  }
+}
