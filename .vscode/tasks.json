@@ -1,0 +1,97 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run Playwright Tests",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"test"
+			],
+			"group": "test",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run Tests in Headed Mode",
+			"type": "shell",
+			"command": "npm",
+			"args": ["run", "test:headed"],
+			"group": "test",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run Tests in UI Mode",
+			"type": "shell",
+			"command": "npm",
+			"args": ["run", "test:ui"],
+			"group": "test",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Debug Playwright Tests",
+			"type": "shell",
+			"command": "npm",
+			"args": ["run", "test:debug"],
+			"group": "test",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Show Test Report",
+			"type": "shell",
+			"command": "npm",
+			"args": ["run", "test:report"],
+			"group": "test",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run Copilot Prompt Coach Tests",
+			"type": "shell",
+			"command": "npm",
+			"args": ["run", "test:copilot"],
+			"group": "test",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run Copilot Tests in Edge",
+			"type": "shell",
+			"command": "npm",
+			"args": ["run", "test:copilot-edge"],
+			"group": "test",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run Copilot Tests with Browser Visible",
+			"type": "shell",
+			"command": "npm",
+			"args": ["run", "test:copilot-headed"],
+			"group": "test",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run Copilot POM Tests",
+			"type": "shell",
+			"command": "npm",
+			"args": ["run", "test:copilot-pom"],
+			"group": "test",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run Copilot Tests with Existing Browser",
+			"type": "shell",
+			"command": "npm",
+			"args": ["run", "test:copilot-existing"],
+			"group": "test",
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}

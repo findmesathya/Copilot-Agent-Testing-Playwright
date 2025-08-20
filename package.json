@@ -1,22 +1,24 @@
 {
-  "name": "copilot-playwright-testing",
+  "name": "microsoft-copilot-playwright-testing",
   "version": "1.0.0",
-  "description": "Advanced Playwright testing framework for Microsoft Copilot with LLM-powered conversation analysis, video recording, and beautiful HTML reports",
+  "description": "Comprehensive Playwright testing framework for Microsoft Copilot with video recording and LLM-powered analysis",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/copilot-playwright-testing.git"
+    "url": "https://github.com/findmesathya/Copilot-Agent-Testing-Playwright.git"
   },
   "bugs": {
-    "url": "https://github.com/your-username/copilot-playwright-testing/issues"
+    "url": "https://github.com/findmesathya/Copilot-Agent-Testing-Playwright/issues"
   },
-  "homepage": "https://github.com/your-username/copilot-playwright-testing#readme",
+  "homepage": "https://github.com/findmesathya/Copilot-Agent-Testing-Playwright#readme",
   "scripts": {
     "test": "playwright test",
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
     "test:debug": "playwright test --debug",
     "test:report": "playwright show-report",
+    "auth:setup": "playwright test tests/auth.setup.ts --project=setup --headed",
+    "auth:setup-headless": "playwright test tests/auth.setup.ts --project=setup",
     "test:copilot": "playwright test tests/copilot-prompt-coach.spec.ts --project=chromium-auth",
     "test:copilot-pom": "playwright test tests/copilot-prompt-coach-pom.spec.ts --project=chromium-auth",
     "test:copilot-existing": "playwright test tests/copilot-existing-browser.spec.ts --project=chromium-no-auth",
@@ -28,27 +30,23 @@
     "generate-report": "node generate-report.js",
     "open-report": "node open-report.js",
     "test:conversation-with-report": "npm run test:copilot-conversation && npm run generate-report && npm run open-report",
-    "auth:setup": "playwright test tests/auth.setup.ts --project=setup --headed",
-    "auth:setup-headless": "playwright test tests/auth.setup.ts --project=setup",
     "install:browsers": "playwright install"
   },
   "keywords": [
     "playwright",
     "testing",
     "automation",
-    "copilot",
-    "microsoft",
+    "microsoft-copilot",
     "e2e",
-    "ai",
+    "ai-testing",
     "llm",
-    "gpt-4o",
-    "conversation",
+    "conversation-analysis",
     "video-recording",
     "html-reports",
     "typescript",
-    "edge"
+    "prompt-coach"
   ],
-  "author": "Your Name <your.email@example.com>",
+  "author": "findmesathya",
   "license": "MIT",
   "devDependencies": {
     "@playwright/test": "^1.54.2",
@@ -56,6 +54,7 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
-    "dotenv": "^17.2.1"
+    "dotenv": "^17.2.1",
+    "openai": "^4.0.0"
   }
 }
