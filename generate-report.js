@@ -8,6 +8,274 @@
 const fs = require('fs');
 const path = require('path');
 
+function generateComprehensiveReport() {
+  try {
+    console.log('🔄 Generating comprehensive test report...\n');
+
+    // Read the test summary
+    const summaryFiles = fs.readdirSync('./test-results/conversation-summary')
+        .filter(file => file.endsWith('.json'))
+        .sort()
+        .reverse(); // Get the most recent
+
+    if (summaryFiles.length === 0) {
+        console.log('No test summary files found.');
+        return;
+    }
+
+    const latestSummary = summaryFiles[0];
+    const summaryPath = `./test-results/conversation-summary/${latestSummary}`;
+    const summary = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
+    console.log(`📋 Found test summary: ${latestSummary}`);
+
+    // Read the detailed Playwright results
+    let playwrightResults = null;
+    try {
+        playwrightResults = JSON.parse(fs.readFileSync('./test-results/results.json', 'utf8'));
+        console.log('📊 Found detailed Playwright execution data');
+    } catch (e) {
+        console.log('⚠️  No Playwright results.json found, using basic summary only');
+    }
+
+    // Read the comprehensive template
+    const template = fs.readFileSync('./test-report-template-comprehensive.html', 'utf8');
+
+    // Extract detailed test data
+    const testResult = playwrightResults?.suites?.[0]?.suites?.[0]?.specs?.[0]?.tests?.[0]?.results?.[0];
+    const screenshots = summary.artifacts?.screenshots || summary.screenshots || [];
+
+    // Generate comprehensive report content
+    const reportContent = generateReportContent(template, summary, testResult, screenshots);
+
+    // Write the report
+    fs.writeFileSync('./test-results/conversation-test-report.html', reportContent);
+    fs.writeFileSync('./conversation-test-report.html', reportContent);
+
+    console.log('✅ Comprehensive test report generated: test-results/conversation-test-report.html');
+    console.log('📋 Report also available at: conversation-test-report.html');
+    
+    const stepCount = testResult?.stdout ? 
+        testResult.stdout.filter(log => {
+            const text = log.text || log.toString();
+            return text.includes('Step ') || text.includes('Conversation Turn') || text.includes('Screenshot saved');
+        }).length : 0;
+        
+    console.log(`📊 Report includes: ${screenshots.length} screenshots, ${stepCount} execution steps, detailed timeline`);
+    
+    if (playwrightResults) {
+        console.log('🎯 Enhanced with detailed Playwright execution data');
+    }
+
+  } catch (error) {
+    console.error('❌ Error generating comprehensive report:', error);
+  }
+}
+
+function generateReportContent(template, summary, testResult, screenshots) {
+  // Helper to replace all placeholders globally
+  function applyPlaceholders(tpl, values) {
+    let out = tpl;
+    for (const [key, val] of Object.entries(values)) {
+      const safe = String(val ?? '');
+      // Replace all occurrences like {{KEY}}
+      out = out.replaceAll(`{{${key}}}`, safe);
+    }
+    return out;
+  }
+
+  // Generate screenshot gallery HTML
+  let screenshotGallery = '';
+  if (screenshots && screenshots.length > 0) {
+      screenshotGallery = screenshots.map((screenshot, index) => {
+          const filename = path.basename(screenshot);
+          const screenshotTime = new Date(Date.now() - ((screenshots.length - index) * 30000));
+          // Use absolute file URL so it works from both root and test-results copies
+          const absPath = path.join(__dirname, 'screenshots', filename).replace(/\\/g, '/');
+          const imgSrc = `file://${absPath}`;
+          return `
+              <div class="screenshot-item">
+                  <img src="${imgSrc}" alt="Screenshot ${index + 1}">
+                  <div class="screenshot-info">
+                      <div class="screenshot-title">Conversation Turn ${index + 1}</div>
+                      <div class="screenshot-timestamp">${screenshotTime.toLocaleTimeString()}</div>
+                  </div>
+              </div>
+          `;
+      }).join('');
+  } else {
+      screenshotGallery = '<p>No screenshots captured during this test run.</p>';
+  }
+
+  // Generate conversation flow steps
+  let conversationSteps = '';
+  if (screenshots && screenshots.length > 0) {
+      conversationSteps = screenshots.map((_, index) => `
+          <div class="flow-step">
+              <div class="step-number">${index + 1}</div>
+              <div>
+                  <strong>Turn ${index + 1}:</strong> User interaction and agent response
+              </div>
+          </div>
+      `).join('');
+  }
+
+  // Generate execution steps from console logs
+  let executionSteps = '';
+  if (testResult?.stdout) {
+      const steps = [];
+      testResult.stdout.forEach(log => {
+          const text = log.text || log.toString();
+          if (text.includes('Step ') || text.includes('Conversation Turn') || text.includes('Screenshot saved')) {
+              steps.push(text.trim());
+          }
+      });
+      
+      executionSteps = steps.map((step, index) => `
+          <div class="step-item">
+              <div class="step-title">${escapeHtml(step)}</div>
+              <div class="step-details">Execution step ${index + 1}</div>
+          </div>
+      `).join('');
+  }
+  
+  if (!executionSteps) {
+      executionSteps = '<p>No detailed execution steps available.</p>';
+  }
+
+  // Generate timeline from console logs
+  let timelineItems = '';
+  if (testResult?.stdout) {
+      const startTime = testResult.startTime ? new Date(testResult.startTime) : new Date();
+      let currentTime = 0;
+      
+      const timelineEvents = [];
+      testResult.stdout.forEach(log => {
+          const text = log.text || log.toString();
+          if (text.includes('Step ') || text.includes('Conversation Turn') || 
+              text.includes('Screenshot saved') || text.includes('LLM generated')) {
+              timelineEvents.push({
+                  time: new Date(startTime.getTime() + currentTime),
+                  text: text.trim()
+              });
+              currentTime += 5000;
+          }
+      });
+      
+      timelineItems = timelineEvents.map(event => `
+          <div class="timeline-item">
+              <div class="timeline-time">${event.time.toLocaleTimeString()}</div>
+              <div class="timeline-content">
+                  <strong>${escapeHtml(event.text)}</strong>
+              </div>
+          </div>
+      `).join('');
+  }
+  
+  if (!timelineItems) {
+      timelineItems = '<div class="timeline-item"><div class="timeline-content">No detailed timeline available.</div></div>';
+  }
+
+  // Generate execution logs
+  let executionLogs = '';
+  if (testResult?.stdout) {
+      executionLogs = testResult.stdout.map(log => 
+          `<div>${escapeHtml(log.text || log.toString())}</div>`
+      ).join('\n');
+  }
+  
+  if (!executionLogs) {
+      executionLogs = '<div>No detailed execution logs available.</div>';
+  }
+
+  // Generate LLM analysis content
+  let llmAnalysisContent = '';
+  if (testResult?.stdout) {
+      const llmResponses = [];
+      testResult.stdout.forEach(log => {
+          const text = log.text || log.toString();
+          if (text.includes('LLM generated follow-up:')) {
+              const response = text.replace('🤖 LLM generated follow-up: ', '').replace(/"/g, '');
+              llmResponses.push(response);
+          }
+      });
+      
+      if (llmResponses.length > 0) {
+          llmAnalysisContent = llmResponses.map((response, index) => `
+              <div class="llm-analysis">
+                  <h4>LLM Follow-up ${index + 1}</h4>
+                  <p>${escapeHtml(response)}</p>
+              </div>
+          `).join('');
+      }
+  }
+  
+  if (!llmAnalysisContent) {
+      llmAnalysisContent = '<p>No LLM analysis data available for this test run.</p>';
+  }
+
+  // Calculate metrics
+  const conversationTurns = screenshots ? screenshots.length : 0;
+  const successRate = testResult && testResult.status === 'passed' ? 100 : 0;
+  const statusClass = (testResult?.status === 'passed') ? 'passed' : 'failed';
+  const testStatus = testResult?.status || summary.status || 'Unknown';
+
+  // Format timestamp
+  const timestamp = new Date(summary.timestamp);
+  const formattedTimestamp = timestamp.toLocaleString();
+
+  // Video section
+  const videoSection = `
+      <div class="video-placeholder">
+          <h4>📹 Test Recording</h4>
+          <p>Video recording is configured but not displayed in this report.</p>
+          <p>Check the test-results folder for video files if recording was enabled.</p>
+      </div>
+  `;
+
+  // Replace placeholders in template
+  return applyPlaceholders(template, {
+      TEST_TITLE: summary.testTitle || 'Conversation Test',
+      TEST_STATUS: testStatus.toUpperCase(),
+      STATUS_CLASS: statusClass,
+      DURATION: formatDuration(testResult?.duration || 0),
+      AGENT_NAME: summary.agentName || 'Microsoft Copilot',
+      BROWSER_INFO: summary.browserInfo || 'Chrome (Existing)',
+      LLM_MODE: summary.llmMode || 'GPT-4o',
+      SCREENSHOT_COUNT: conversationTurns,
+      FORMATTED_TIMESTAMP: formattedTimestamp,
+      CONVERSATION_STEPS: conversationSteps,
+      CONVERSATION_TURNS: conversationTurns,
+      SUCCESS_RATE: successRate,
+      AGENT_RESPONSES: conversationTurns,
+      INITIAL_PROMPT: summary.initialPrompt || 'Test user interaction with Microsoft Copilot',
+      VIDEO_SECTION: videoSection,
+      EXECUTION_STEPS: executionSteps,
+      SCREENSHOT_GALLERY: screenshotGallery,
+      TIMELINE_ITEMS: timelineItems,
+      EXECUTION_LOGS: executionLogs,
+      LLM_ANALYSIS_CONTENT: llmAnalysisContent,
+  });
+}
+
+function formatDuration(ms) {
+    if (!ms) return 'N/A';
+    const seconds = Math.round(ms / 1000);
+    if (seconds < 60) return `${seconds}s`;
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}m ${remainingSeconds}s`;
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    return text.toString()
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 function generateHTMLReport() {
   console.log('🔄 Generating HTML test report...\n');
 
@@ -165,7 +433,13 @@ function generateHTMLReport() {
 
 // Run the generator
 try {
-  generateHTMLReport();
+  // First try to generate comprehensive report if template exists
+  if (fs.existsSync('./test-report-template-comprehensive.html')) {
+    generateComprehensiveReport();
+  } else {
+    console.log('Comprehensive template not found, falling back to basic report...');
+    generateHTMLReport();
+  }
 } catch (error) {
   console.error('❌ Error generating report:', error.message);
   process.exit(1);

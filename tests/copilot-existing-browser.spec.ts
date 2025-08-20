@@ -73,12 +73,13 @@ async function analyzeScreenshotWithLLM(screenshotPath: string, conversationCont
     const systemPrompt = `You are an intelligent conversation assistant analyzing a screenshot of a Microsoft Copilot chat interface of a chat between Agent and the user. 
     Your task is to:
     1. Analyze the visual content of the screenshot to understand the current state of the conversation
-    2. Read and understand the agent's latest response visible in the screenshot. This response might have follow-up questions to user. If there are questions or clarifications needed, incorporate them into your response in Step 3
+    2. Read and understand the agent's latest response visible in the screenshot. This response might have some follow-up questions to user. If there are questions or clarifications needed, answer those questions in your response in Step 3
     3. Generate a natural, contextual response answer or comment that would meaningfully continue the conversation and answers if there are any follow-up questions or clarifications needed.
     
     Guidelines:
     - Generate responses that feel natural and human-like
     - Create hypothetical but relevant responses - be specific to the conversation content
+    - Unless required, do not ask questions. Your job is to answer questions or continue conversation. Do not ask follow-up questions
     - Keep responses conversational and engaging
     - If the conversation seems to be concluding naturally, thank the agent. 
     
