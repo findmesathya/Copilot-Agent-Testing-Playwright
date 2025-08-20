@@ -2,12 +2,10 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "Run Playwright Tests",
+			"label": "Run All Playwright Tests",
 			"type": "shell",
 			"command": "npm",
-			"args": [
-				"test"
-			],
+			"args": ["test"],
 			"group": "test",
 			"isBackground": false,
 			"problemMatcher": []
@@ -49,46 +47,55 @@
 			"problemMatcher": []
 		},
 		{
-			"label": "Run Copilot Prompt Coach Tests",
+			"label": "Setup Authentication",
 			"type": "shell",
 			"command": "npm",
-			"args": ["run", "test:copilot"],
+			"args": ["run", "auth:setup"],
 			"group": "test",
 			"isBackground": false,
 			"problemMatcher": []
 		},
 		{
-			"label": "Run Copilot Tests in Edge",
+			"label": "Run Existing Browser Tests",
 			"type": "shell",
 			"command": "npm",
-			"args": ["run", "test:copilot-edge"],
+			"args": ["run", "test:existing-browser"],
 			"group": "test",
 			"isBackground": false,
 			"problemMatcher": []
 		},
 		{
-			"label": "Run Copilot Tests with Browser Visible",
+			"label": "Run Existing Browser Tests (Headed)",
 			"type": "shell",
 			"command": "npm",
-			"args": ["run", "test:copilot-headed"],
+			"args": ["run", "test:existing-browser-headed"],
 			"group": "test",
 			"isBackground": false,
 			"problemMatcher": []
 		},
 		{
-			"label": "Run Copilot POM Tests",
+			"label": "Run Generic Agent Tests",
 			"type": "shell",
 			"command": "npm",
-			"args": ["run", "test:copilot-pom"],
+			"args": ["run", "test:generic-agents"],
 			"group": "test",
 			"isBackground": false,
 			"problemMatcher": []
 		},
 		{
-			"label": "Run Copilot Tests with Existing Browser",
+			"label": "Run Generic Agent Tests (Headed)",
 			"type": "shell",
 			"command": "npm",
-			"args": ["run", "test:copilot-existing"],
+			"args": ["run", "test:generic-agents-headed"],
+			"group": "test",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Test with Report Generation",
+			"type": "shell",
+			"command": "npm",
+			"args": ["run", "test:with-report"],
 			"group": "test",
 			"isBackground": false,
 			"problemMatcher": []
